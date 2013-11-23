@@ -5,9 +5,10 @@
 
 var express = require('express')
   , http = require('http')
-  , path = require('path');
-
-var app = express();
+  , path = require('path')
+  , app = express()
+  , server = http.createServer(app)
+  , io = require('socket.io').listen(server);
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
@@ -23,6 +24,15 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-http.createServer(app).listen(app.get('port'), function(){
+// socket io stuff
+io.sockets.on("connection", function(socket) {
+  console.log("[NOTIFICATION] - New connection");
+  io.sockets.emit("message", { message: "New connection" });
+  socket.on("send", function(data) {
+    io.sockets.emit("message", { message: data.message });
+  });
+});
+
+server.listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });

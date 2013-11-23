@@ -7,19 +7,32 @@ App.Router.map(function() {
 
 Ember.MessagesArray = Ember.ArrayProxy.extend({
   init: function() {
-    var messages = Ember.A(['red', 'yellow', 'blue']);
+    var messages = Ember.A();
     this.set("content", messages);
 
-    // this.socket.on
+    this.socket.on("message", function(data) {
+      messages.pushObject(data.message);
+    });
 
     this._super();
+  },
+  replaceContent: function(ids, amt, object) {
+   this.socket.emit("send", { message: object });
   }
 });
 
-window.messages = Ember.MessagesArray.create();
-
 App.IndexRoute = Ember.Route.extend({
   model: function() {
-    return window.messages;
+    return Ember.MessagesArray.create({ socket: io.connect("http://localhost") });
+  }
+});
+
+App.IndexController = Ember.ArrayController.extend({
+  msg: "",
+  actions: {
+    sendMessage: function() {
+      this.pushObject(this.get("msg"));
+      this.set("msg", "");
+    }
   }
 });
