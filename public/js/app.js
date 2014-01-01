@@ -18,7 +18,7 @@ Ember.MessagesArray = Ember.ArrayProxy.extend({
 
 App.IndexRoute = Ember.Route.extend({
   model: function() {
-    return Ember.MessagesArray.create({ socket: io.connect("http://localhost") });
+    return Ember.MessagesArray.create({ socket: io.connect(document.URL) });
   }
 });
 
