@@ -1,10 +1,5 @@
 App = Ember.Application.create();
 
-App.Router.map(function() {
-  // put your routes here
-});
-
-
 Ember.MessagesArray = Ember.ArrayProxy.extend({
   init: function() {
     var messages = Ember.A();
@@ -34,5 +29,17 @@ App.IndexController = Ember.ArrayController.extend({
       this.pushObject(this.get("msg"));
       this.set("msg", "");
     }
+  }
+});
+
+App.ScrollingDivComponent = Ember.Component.extend({
+  scheduleScrollIntoView: function() {
+    // Only run once per tick, once rendering has completed;
+    // avoid flood of scrolls when many updates happen at once
+    Ember.run.scheduleOnce("afterRender", this, "scrollIntoView");
+  }.observes("update-when.@each"),
+
+  scrollIntoView: function() {
+    this.$().scrollTop(this.$().prop("scrollHeight"));
   }
 });
